@@ -1,0 +1,40 @@
+{% block content %}
+<table class="table table-striped table-hover">
+    <thead>
+        <tr>
+            <th>№</th>
+            <th>Ім'я</th>
+            <th>Прізвище</th>
+            <th>Телефон</th>
+            <th>Email</th>
+            <th>Адреса</th>
+            <th>Інфо</th>
+            <th>Вік</th>
+            <th>Аватар</th>
+            <th>Дії</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for contact in contacts %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ contact.first_name }}</td>
+            <td>{{ contact.last_name }}</td>
+            <td>{{ contact.phone_number }}</td>
+            <td>{{ contact.email }}</td>
+            <td>{{ contact.address }}</td>
+            <td>{{ contact.bio }}</td>
+            <td>{% if contact.age %} {{ contact.age }} {% endif %}</td>
+            <td>
+                {% if contact.profile_picture %}
+                    <img src="{{ MEDIA_URL }}{{ contact.profile_picture }}" alt="Аватарка" width="50px">
+                {% endif %}
+            </td>
+            <td>
+                <a href="{% url 'remove_contact' contact_id=contact.id %}" class="btn btn-danger">Видалити</a>
+                <a href="{% url 'edit_contact' contact_id=contact.id %}" class="btn btn-warning">Редагувати</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

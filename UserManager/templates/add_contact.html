@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+<form method="post" enctype="multipart/form-data">
+    <h3>Додати новий контакт</h3>
+    {% csrf_token %}
+    <!-- {{ form.as_p }} -->
+    {% for field in form %}
+        {{ fiels.errors }}
+        {{ field.label_tag }} {{ field }}
+    {% endfor %}
+    <input type="submit" class="btn btn-success" value="Додати">
+</form>
+{% endblock content %}

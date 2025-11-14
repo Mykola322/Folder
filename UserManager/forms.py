@@ -1,39 +1,64 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from django.http import HttpRequest
-from django.contrib import messages
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.models import User
+from django import forms
 
-from .models import Planer
-#form PhoneBook.models import Contact
-from .forms import PlanerForm, Contact
+from .models import MySuperUser
 
+class SignUpForm(UserCreationForm):
+    username = forms.CharField(
+        max_length=20,
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+        label="Логін"
+    )
 
+    first_name = forms.CharField(
+        label="Ім'я",
+        max_length=20,
+        widget=forms.TextInput(attrs={"class": "form-control"})
+    )
 
-@login_required
-def add_planer(request: HttpRequest):
-    form = PlanerForm()
-    if request.method == "POST":
-        form = PlanerForm(request.POST)
-        if form.is_valid():
-            planer = form.save(commit=False)
-            planer.user = request.user
-            planer.save()
-        messages.add_message(request, messages.SUCCESS, "Зустріч успішно cтворена")
-        return redirect("get_planners")
+    last_name = forms.CharField(
+        label="Прізвище",
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+        max_length=20
+    )
 
-    form.fields=["contact"].queryset = Contact.objects.filter(user=request.user).all()
-    return render(request, "add_planer.html", dict(form=form))
+    email = forms.EmailField(
+        max_length=250,
+        widget=forms.EmailInput(attrs={"class": "form-control"}),
+        label="Електронна пошта"
+    )
 
+    phone_number = forms.CharField(
+        label="Номер телефону",
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+        max_length=16,
+        required=False
+    )
 
-@login_required
-def get_my_planers(request: HttpRequest):
-    planers = Planer.objects.filter(user=request.user).all()
-    return render(request, "my_planers.html", dict(planers=planers))
+    address = forms.CharField(
+        label="Адреса",
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+        max_length=200,
+        required=False
+    )
+    password1 = forms.CharField(
+        label="Пароль",
+        widget=forms.PasswordInput(attrs={"class": "form-control"}),
+        max_length=100
+    )
 
+    password2 = forms.CharField(
+        label="Повторіть пароль",
+        widget=forms.PasswordInput(attrs={"class": "form-control"}),
+        max_length=100
+    )
 
-@login_required
-def get_planers_for_me(request: HttpRequest):
-    planers = Planer.objects.filter(contact__user=request.user.first_name, contact__last_name=request.user.last_name).all()
-    return render(request, "planers_for_me.html", dict(planers=planers))
+    class Meta:
+        # model = User
+        model = MySuperUser
+        fields = ("username", "first_name", "last_name", "email", "phone_number", "address", "password1", "password2")
 
-
+    class LoginForm(AuthenticationForm):
+        username = forms.CharField(max_length=20, widget=forms.TextInput(attrs={"class": "form-control"}), label="Логін")
+        password = forms.CharField(max_length=50, widget=forms.PasswordInput(attrs={"class": "form-control"}), label="Пароль")
